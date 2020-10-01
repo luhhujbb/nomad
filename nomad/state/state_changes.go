@@ -204,6 +204,8 @@ func processDBChanges(tx ReadTxn, changes Changes) ([]stream.Event, error) {
 		return ApplyPlanResultEventsFromChanges(tx, changes)
 	case structs.EvalUpdateRequestType:
 		return GenericEventsFromChanges(tx, changes)
+	case structs.AllocClientUpdateRequestType:
+		return GenericEventsFromChanges(tx, changes)
 	}
 	return []stream.Event{}, nil
 }

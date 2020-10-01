@@ -819,7 +819,7 @@ func (n *nomadFSM) applyAllocClientUpdate(msgType structs.MessageType, buf []byt
 
 	// Update any evals
 	if len(req.Evals) > 0 {
-		if err := n.upsertEvals(context.Background(), index, req.Evals); err != nil {
+		if err := n.upsertEvals(ctx, index, req.Evals); err != nil {
 			n.logger.Error("applyAllocClientUpdate failed to update evaluations", "error", err)
 			return err
 		}

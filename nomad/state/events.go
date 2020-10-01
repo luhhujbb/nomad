@@ -76,6 +76,8 @@ func GenericEventsFromChanges(tx ReadTxn, changes Changes) ([]stream.Event, erro
 	switch changes.MsgType {
 	case structs.EvalUpdateRequestType:
 		eventType = TypeEvalUpdated
+	case structs.AllocClientUpdateRequestType:
+		eventType = TypeAllocUpdated
 	}
 
 	var events []stream.Event
@@ -94,6 +96,24 @@ func GenericEventsFromChanges(tx ReadTxn, changes Changes) ([]stream.Event, erro
 				Key:   after.ID,
 				Payload: &EvalEvent{
 					Eval: after,
+				},
+			}
+
+			events = append(events, event)
+
+		case "allocs":
+			after, ok := change.After.(*structs.Allocation)
+			if !ok {
+				return nil, fmt.Errorf("transaction change was not an Allocation")
+			}
+
+			event := stream.Event{
+				Topic: TopicAlloc,
+				Type:  eventType,
+				Index: changes.Index,
+				Key:   after.ID,
+				Payload: &AllocEvent{
+					Alloc: after,
 				},
 			}
 

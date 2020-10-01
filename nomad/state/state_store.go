@@ -3031,7 +3031,7 @@ func (s *StateStore) EvalsByNamespace(ws memdb.WatchSet, namespace string) (memd
 // the desired state comes from the schedulers, while the actual state comes
 // from clients.
 func (s *StateStore) UpdateAllocsFromClient(ctx context.Context, index uint64, allocs []*structs.Allocation) error {
-	txn := s.db.WriteTxn(index)
+	txn := s.db.WriteTxnCtx(ctx, index)
 	defer txn.Abort()
 
 	// Handle each of the updated allocations
