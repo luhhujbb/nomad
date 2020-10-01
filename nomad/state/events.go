@@ -1,6 +1,8 @@
 package state
 
 import (
+	"fmt"
+
 	"github.com/hashicorp/nomad/nomad/stream"
 	"github.com/hashicorp/nomad/nomad/structs"
 )
@@ -27,6 +29,8 @@ const (
 
 	TypeAllocCreated = "AllocCreated"
 	TypeAllocUpdated = "AllocUpdated"
+
+	TypeEvalUpdated = "EvalUpdated"
 )
 
 type JobEvent struct {
@@ -65,4 +69,37 @@ type NodeDrainAllocDetails struct {
 type JobDrainDetails struct {
 	Type         string
 	AllocDetails map[string]NodeDrainAllocDetails
+}
+
+func GenericEventsFromChanges(tx ReadTxn, changes Changes) ([]stream.Event, error) {
+	var eventType string
+	switch changes.MsgType {
+	case structs.EvalUpdateRequestType:
+		eventType = TypeEvalUpdated
+	}
+
+	var events []stream.Event
+	for _, change := range changes.Changes {
+		switch change.Table {
+		case "evals":
+			after, ok := change.After.(*structs.Evaluation)
+			if !ok {
+				return nil, fmt.Errorf("transaction change was not an Evaluation")
+			}
+
+			event := stream.Event{
+				Topic: TopicEval,
+				Type:  eventType,
+				Index: changes.Index,
+				Key:   after.ID,
+				Payload: &EvalEvent{
+					Eval: after,
+				},
+			}
+
+			events = append(events, event)
+		}
+	}
+
+	return events, nil
 }
