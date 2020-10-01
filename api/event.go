@@ -3,6 +3,8 @@ package api
 import (
 	"context"
 	"encoding/json"
+
+	"github.com/hashicorp/nomad/api"
 )
 
 type Events struct {
@@ -23,6 +25,26 @@ type Event struct {
 
 func (e *Events) IsHeartBeat() bool {
 	return e.Index == 0 && len(e.Events) == 0
+}
+
+type JobEvent struct {
+	Job api.Job
+}
+
+type EvalEvent struct {
+	Eval api.Evaluation
+}
+
+type AllocEvent struct {
+	Alloc api.Allocation
+}
+
+type DeploymentEvent struct {
+	Deployment api.Deployment
+}
+
+type NodeEvent struct {
+	Node api.Node
 }
 
 type EventStream struct {
@@ -83,5 +105,4 @@ func (e *EventStream) Stream(ctx context.Context, topics map[Topic][]string, ind
 	}()
 
 	return eventsCh, errCh
-
 }

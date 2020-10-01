@@ -15,7 +15,6 @@ func TestEvent_Stream(t *testing.T) {
 	defer s.Stop()
 
 	// register job to generate events
-
 	jobs := c.Jobs()
 	job := testJob()
 	resp2, _, err := jobs.Register(job, nil)
@@ -29,7 +28,6 @@ func TestEvent_Stream(t *testing.T) {
 		"*": {"*"},
 	}
 
-	// s.Server.State().EventPublisher()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -39,7 +37,6 @@ OUTER:
 	for {
 		select {
 		case event := <-streamCh:
-
 			require.Equal(t, len(event.Events), 1)
 			require.Equal(t, "Eval", string(event.Events[0].Topic))
 
